@@ -194,9 +194,26 @@ local function postflight( ctx, parentURI, uris, depth, errs )
 end
 
 
+local function preflight( self, ctx, uri )
+    local uris, err = imprint( ctx, uri );
+    
+    if not err then
+        if uris then
+            local errs = {};
+            postflight( ctx, uri, uris, self.cfg.DEPTH, errs );
+            if #errs > 0 then
+                err = table.concat( errs, '\n' );
+            end
+        end
+    end
+    
+    return err;
+end
+
+
 local MT = {};
 
-function MT:publish( docroot, uri, data )
+function MT:publish( docroot, uri, data, layout )
     local ok = false;
     local res, err;
     
@@ -204,20 +221,28 @@ function MT:publish( docroot, uri, data )
         err = 'docroot must be type of string';
     elseif type( uri ) ~= 'string' then
         err = 'uri must be type of string';
+    elseif layout ~= nil and type( layout ) ~= 'string' then
+        err = 'layout must be type of string';
     else
-        local ctx = getContext( self, docroot, uri );
-        local uris;
+        local ctx = getContext( self, docroot );
         
-        uris, err = imprint( ctx, uri );
+        -- check data type
+        data = type( data ) == 'table' and data or {};
+        
+        -- preflight for request-uri
+        err = preflight( self, ctx, uri );
         if not err then
-            if uris then
-                local errs = {};
-                postflight( ctx, uri, uris, self.cfg.DEPTH, errs );
-                if #errs > 0 then
-                    err = table.concat( errs, '\n' );
+            -- check layout
+            if layout then
+                -- preflight for layout
+                err = preflight( self, ctx, layout )
+                if err then
+                    return ok, res, err;
                 end
+                uri = layout;
             end
-            -- run template engine
+            
+            -- run template
             res, ok = ctx.rev:render( uri, data, true );
         end
     end
