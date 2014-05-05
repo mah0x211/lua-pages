@@ -127,7 +127,7 @@ end
 
 
 local function readFile( ctx, uri )
-    local fh, err = io.open( pathNormalize( ctx.docroot, uri ) );
+    local fh, err = io.open( ctx.docroot .. pathNormalize( uri ) );
     local src;
     
     if not err then
