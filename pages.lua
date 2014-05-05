@@ -91,6 +91,7 @@ local function getContext( self, docroot )
     return {
         rev = rev,
         caches = caches,
+        epoch = os.time(),
         docroot = docroot,
         errs = {},
         cfg = self.cfg
@@ -104,7 +105,7 @@ local function getCache( ctx, uri )
     local uris;
     
     if cache then
-        if cache.expr < 0 or cache.expr > os.time() then
+        if cache.expr < 0 or cache.expr > ctx.epoch then
             rc = true;
             uris = cache.uris;
         -- remove cache
@@ -120,7 +121,7 @@ end
 
 local function setCache( ctx, uri, uris )
     ctx.caches[uri] = {
-        expr = ctx.cfg.EXPRS < 0 and ctx.cfg.EXPRS or ( os.time() + ctx.cfg.EXPRS );
+        expr = ctx.cfg.EXPRS < 0 and ctx.cfg.EXPRS or ( ctx.epoch + ctx.cfg.EXPRS );
         uris = uris
     };
 end
