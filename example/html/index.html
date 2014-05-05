@@ -1,0 +1,192 @@
+<html>
+<head>
+<title>Example Template</title>
+</head>
+<body>
+<h1>Example Template</h1>
+
+<h2 id="template-syntax-and-commands-">Template Syntax And Commands.</h2>
+
+<h3 id="put">put</h3>
+<pre>
+&lt;?put &#39;Hello World&#39; ?&gt;
+&lt;?put &#39;Hello&#39; .. &#39;World&#39; ?&gt;
+&lt;?put &#39;Hello&#39;, &#39;World&#39; ?&gt;
+</pre>
+
+<p>to be rendered as below;</p>
+
+<pre>
+<?put 'Hello World' ?>
+<?put 'Hello' .. 'World' ?>
+<?put 'Hello', 'World' ?>
+</pre>
+
+
+<h3 id="code">code</h3>
+<p>use for write the one-liner lua code but cannot be write a control statements.</p>
+<pre>&lt;?code x = 1 ?&gt;
+&lt;?code y = { 1, 2, 3 } ?&gt;
+&lt;?code z = table.concat( y, &#39;-&#39; ) ?&gt;
+</pre>
+
+<pre>
+<?code x = 1 ?>
+<?code y = { 1, 2, 3 } ?>
+<?code z = table.concat( y, '-' ) ?>
+</pre>
+
+
+<h3 id="insert">insert</h3>
+<p>render the template associated with label, and insert the result string.</p>
+
+<pre>
+&lt;?insert &#39;/insert.html&#39; ?&gt;
+</pre>
+
+<pre>
+<?insert '/insert.html' ?>
+</pre>
+
+
+<h3 id="if-elseif-else">if-elseif-else</h3>
+<pre>
+&lt;?if x == true ?&gt;
+x is true
+&lt;?elseif x == false ?&gt;
+x is false
+&lt;?else?&gt;
+x is &lt;?put x ?&gt;
+&lt;?end?&gt;
+</pre>
+
+<pre>
+<?if x == true ?>
+x is true
+<?elseif x == false ?>
+x is false
+<?else?>
+x is <?put x ?>
+<?end?>
+</pre>
+
+
+<h3 id="for">for</h3>
+<pre>
+&lt;?for i = 0, 10 ?&gt;
+i is &lt;?put i ?&gt;
+&lt;?end?&gt;
+</pre>
+
+<pre>
+<?for i = 0, 10 ?>
+i is <?put i ?>
+<?end?>
+</pre>
+
+<pre>
+&lt;?for idx, val in pairs( y ) ?&gt;
+&lt;?put idx ?&gt; is &lt;?put val ?&gt;
+&lt;?end?&gt;
+</pre>
+
+<pre>
+<?for idx, val in pairs( y ) ?>
+<?put idx ?> is <?put val ?>
+<?end?>
+</pre>
+
+<pre>
+&lt;?for idx, val in ipairs( y ) ?&gt;
+&lt;?put idx ?&gt; is &lt;?put val ?&gt;
+&lt;?end?&gt;
+</pre>
+
+<pre>
+<?for idx, val in ipairs( y ) ?>
+<?put idx ?> is <?put val ?>
+<?end?>
+</pre>
+
+
+<h3 id="while">while</h3>
+<pre>
+&lt;?while x &lt; 10 ?&gt;
+x is &lt;?put x ?&gt;
+&lt;?code x = x + 1 ?&gt;
+&lt;?end?&gt;
+</pre>
+
+<pre><code>
+<?while x < 10 ?>
+x is <?put x ?>
+<?code x = x + 1 ?>
+<?end?></code></pre>
+
+
+<h3 id="break">break</h3>
+<pre>
+&lt;?for i = 0, 10 ?&gt;
+i is &lt;?put i ?&gt;
+&lt;?if i == 5 ?&gt;
+&lt;?break?&gt;
+&lt;?end?&gt;
+&lt;?end?&gt;
+</pre>
+
+<pre>
+<?for i = 0, 10 ?>
+i is <?put i ?>
+<?if i == 5 ?>
+<?break?>
+<?end?>
+<?end?>
+</pre>
+
+<pre>
+&lt;?while x &lt; 10 ?&gt;
+x is &lt;?put x ?&gt;
+&lt;?code x = x + 1 ?&gt;
+&lt;?if i == 5 ?&gt;
+&lt;?break?&gt;
+&lt;?end?&gt;
+&lt;?end?&gt;
+</pre>
+
+<pre>
+<?while x < 10 ?>
+x is <?put x ?>
+<?code x = x + 1 ?>
+<?if i == 5 ?>
+<?break?>
+<?end?>
+<?end?>
+</pre>
+
+<h3 id="-prefixed-custom-template-syntax"><code>$</code> Prefixed Custom Template Syntax</h3>
+<pre>
+&lt;?$put &#39;Hello World&#39; ?&gt;
+</pre>
+
+<p>to be rendered as below;</p>
+
+<pre>
+<?$put 'Hello World' ?>
+</pre>
+
+<h3 id="-prefixed-variable"><code>$</code> Prefixed variable</h3>
+<p><code>$</code> prefixed variable is reference of the external table.</p>
+
+<pre>
+&lt;?put $.x.y.z ?&gt;
+</pre>
+
+<p>to be rendered as below;</p>
+
+<pre>
+<?put $.x.y.z ?>
+</pre>
+
+
+</body>
+</html>
