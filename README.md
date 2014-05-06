@@ -10,12 +10,12 @@ this module use the [tsukuyomi](https://github.com/mah0x211/tsukuyomi) template 
 
 **Parameters**
 
-- opts: options. (following are default values​​)
-  - exprs = -1, -- cache expiration seconds. (-1 = disable expiration)
-  - depth = 1, -- number of insertion depth limit.
-  - sandbox = _G, -- sandboxing.
-  - cmds = {}, -- custom-commands
-  - fixnl = false -- fix newline character (replace CR/CRLF to LF)
+- opts: option table. (following are default values​​)
+  - `exprs` = -1, -- cache expiration seconds. (-1 = disable expiration)
+  - `depth` = 1, -- number of insertion depth limit.
+  - `sandbox` = _G, -- sandboxing.
+  - `cmds` = {}, -- custom-commands
+  - `fixnl` = false -- fix newline character (replace CR/CRLF to LF)
 
 
 **Returns**
