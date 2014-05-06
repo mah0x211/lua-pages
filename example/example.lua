@@ -6,8 +6,8 @@ local pages = require('pages').create({
     depth = 1,
     -- sandbox
     sandbox = require('pages.sandbox'),
-    -- custom-tags
-    ctags = require('ctags')
+    -- custom-commands
+    cmds = require('cmds')
 });
 local data = {
     x = {
