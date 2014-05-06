@@ -36,8 +36,8 @@ local DEFAULT = {
     DEPTH = 1,
     -- sandboxing
     SANDBOX = _G,
-    -- custom-tags
-    CTAGS = {},
+    -- custom-commands
+    CMDS = {},
     -- fix newline character (replace CR/CRLF to LF)
     FIXNL = false
 };
@@ -78,7 +78,7 @@ local function getContext( self, docroot )
         rev = tsukuyomi.new( self.cfg.SANDBOX );
         self.instance[docroot] = rev;
         -- append ctags
-        for tag, def in pairs( self.cfg.CTAGS ) do
+        for tag, def in pairs( self.cfg.CMDS ) do
             tsukuyomi.setCmd( rev, tag, def[1], def[2] );
         end
     end
@@ -277,7 +277,7 @@ local function create( cfg )
     end
     
     -- check ctags format
-    for k, v in pairs( tbl.CTAGS ) do
+    for k, v in pairs( tbl.CMDS ) do
         if type( v ) ~= 'table' then
             error( ('ctags.%s must be type of table'):format( k ) );
         elseif type( v[1] ) ~= 'function' then
