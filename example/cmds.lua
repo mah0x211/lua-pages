@@ -1,4 +1,3 @@
--- escape html
 local function put( str )
     return str .. ' : custom put command';
 end
