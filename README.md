@@ -74,6 +74,7 @@ local data = {
         }
     }
 };
+local DOCROOT = './html';
 local ok, res, err = pages:publish( DOCROOT, '/index.html', data );
 print( ok, res, err );
 ```
