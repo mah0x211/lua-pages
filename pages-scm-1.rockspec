@@ -15,13 +15,10 @@ dependencies = {
     "tsukuyomi"
 }
 build = {
-    type = "command",
-    install_command = "sh install.sh",
-    install = {
-        lua = {
-            pages = "pages.lua",
-            ["pages.sandbox"] = "lib/sandbox.lua"
-        }
+    type = "builtin",
+    modules = {
+        pages = "pages.lua",
+        ["pages.sandbox"] = "lib/sandbox.lua"
     }
 }
 
