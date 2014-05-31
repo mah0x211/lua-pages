@@ -4,6 +4,12 @@ lua-pages
 Lua Template Processor.  
 this module use the [tsukuyomi](https://github.com/mah0x211/tsukuyomi) template engine internally.
 
+## Installation
+
+```sh
+luarocks install --from=http://mah0x211.github.io/rocks/ pages
+```
+
 ## Create Template Object
 
 ### obj = pages.create( opts )
