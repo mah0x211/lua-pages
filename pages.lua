@@ -75,11 +75,11 @@ local function getContext( self, docroot )
     if not rev then
         local tag, def;
         
-        rev = tsukuyomi.new( self.cfg.SANDBOX );
+        rev = tsukuyomi.new( true, self.cfg.SANDBOX );
         self.instance[docroot] = rev;
         -- append ctags
         for tag, def in pairs( self.cfg.CMDS ) do
-            tsukuyomi.setCmd( rev, tag, def[1], def[2] );
+            rev:setCommand( tag, def[1], def[2] );
         end
     end
     -- create cache-table
@@ -111,7 +111,7 @@ local function getCache( ctx, uri )
         -- remove cache
         else
             ctx.caches[uri] = nil;
-            tsukuyomi.remove( ctx.rev, ctx.uri );
+            ctx.rev:unsetPage( uri );
         end
     end
     
@@ -147,7 +147,7 @@ end
 
 
 local function review( ctx, uri, src )
-    local uris, err = tsukuyomi.read( ctx.rev, uri, src, true );
+    local uris, err = ctx.rev:setPage( uri, src );
     
     if not err then
         setCache( ctx, uri, uris );
@@ -180,8 +180,11 @@ local function postflight( ctx, parentURI, uris, depth, errs )
     
     for uri in pairs( uris ) do
         if depth < 1 then
-            review( ctx, uri, '<!-- could not insert:' .. parentURI .. ' - ' .. 
-                    uri .. ': insertion-depth limit exceeded -->' );
+            review( 
+                ctx, uri, 
+                ('<!-- could not insert: %q - %q : insertion-depth limit exceeded -->')
+                :format( parentURI, uri )
+            );
         else
             childURIs, err = imprint( ctx, uri );
             if err then
