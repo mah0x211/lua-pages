@@ -199,18 +199,19 @@ end
 
 local function preflight( self, ctx, uri )
     local uris, err = imprint( ctx, uri );
+    local errs;
     
-    if not err then
-        if uris then
-            local errs = {};
-            postflight( ctx, uri, uris, self.cfg.DEPTH, errs );
-            if #errs > 0 then
-                err = table.concat( errs, '\n' );
-            end
+    if not err and uris then
+        errs = {};
+        postflight( ctx, uri, uris, self.cfg.DEPTH, errs );
+        if #errs > 0 then
+            errs = table.concat( errs, '\n' );
+        else
+            errs = nil;
         end
     end
     
-    return err;
+    return err, errs;
 end
 
 
