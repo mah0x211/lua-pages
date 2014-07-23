@@ -229,29 +229,34 @@ function MT:publish( docroot, uri, data, layout )
         err = 'layout must be type of string';
     else
         local ctx = getContext( self, docroot );
+        local errs;
         
         -- check data type
         data = type( data ) == 'table' and data or {};
         
         -- preflight for request-uri
-        err = preflight( self, ctx, uri );
+        err, errs = preflight( self, ctx, uri );
         if not err then
-            -- check layout
-            if layout then
-                -- preflight for layout
-                err = preflight( self, ctx, layout )
-                if err then
-                    return ok, res, err;
-                end
-                uri = layout;
-            end
-            
             -- run template
             res, ok = ctx.rev:render( uri, data, true );
         end
+        
+        -- check layout
+        if not err and layout then
+            -- preflight for layout
+            err = preflight( self, ctx, layout )
+            if err then
+                return ok, res, err;
+            end
+            
+            -- set page response
+            rawset( data, 'layoutContent', res );
+            -- run template
+            res, ok = ctx.rev:render( layout, data, true );
+        end
     end
     
-    return ok, res, err;
+    return ok, res, err, errs;
 end
 
 
