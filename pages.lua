@@ -246,7 +246,7 @@ function MT:publish( docroot, uri, data, layout )
             -- preflight for layout
             err = preflight( self, ctx, layout )
             if err then
-                return ok, res, err;
+                return false, res, err;
             end
             
             -- set page response
