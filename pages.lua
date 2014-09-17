@@ -71,7 +71,7 @@ end
 local function getContext( self, docroot )
     local rev, caches = self.instance[docroot], self.caches[docroot];
     
-    -- create tsukuyomi instance per documentroot
+    -- create tsukuyomi instance and cache-table per documentroot
     if not rev then
         local tag, def;
         
@@ -81,9 +81,8 @@ local function getContext( self, docroot )
         for tag, def in pairs( self.cfg.CMDS ) do
             rev:setCommand( tag, def[1], def[2] );
         end
-    end
-    -- create cache-table
-    if not caches then
+
+        -- create cache-table
         caches = {};
         self.caches[docroot] = caches;
     end
@@ -101,32 +100,24 @@ end
 
 -- cache control
 local function getCache( ctx, uri )
-    local rc, cache = false, ctx.caches[uri];
-    local uris;
-    
-    if cache then
-        if cache.expr < 0 or cache.expr > ctx.epoch then
-            rc = true;
-            uris = cache.uris;
-        -- remove cache
-        else
-            ctx.caches[uri] = nil;
-            ctx.rev:unsetPage( uri );
-        end
+    local cache = ctx.caches[uri];
+
+    if not cache then
+        return false;
+    -- return cached uris
+    elseif cache.expr < 0 or cache.expr > ctx.epoch then
+        return true, cache.uris;
     end
-    
-    return rc, uris;
+
+    -- remove expired cache
+    ctx.caches[uri] = nil;
+    ctx.rev:unsetPage( uri );
+
+    return false;
 end
 
 
-local function setCache( ctx, uri, uris )
-    ctx.caches[uri] = {
-        expr = ctx.cfg.EXPRS < 0 and ctx.cfg.EXPRS or ( ctx.epoch + ctx.cfg.EXPRS );
-        uris = uris
-    };
-end
-
-
+-- read template file
 local function readFile( ctx, uri )
     local fh, err = io.open( ctx.docroot .. pathNormalize( uri ) );
     local src;
@@ -146,11 +137,15 @@ local function readFile( ctx, uri )
 end
 
 
+-- compile and cache a template
 local function review( ctx, uri, src )
     local uris, err = ctx.rev:setPage( uri, src );
     
     if not err then
-        setCache( ctx, uri, uris );
+        ctx.caches[uri] = {
+            expr = ctx.cfg.EXPRS < 0 and ctx.cfg.EXPRS or ( ctx.epoch + ctx.cfg.EXPRS );
+            uris = uris
+        };
     end
     
     return uris, err;
@@ -159,19 +154,19 @@ end
 
 local function imprint( ctx, uri )
     local cached, uris = getCache( ctx, uri );
-    local err;
-    
-    -- no cached
+
+    -- not cached
     if cached == false then
-        local src;
-        
-        src, err = readFile( ctx, uri );
+        local src, err = readFile( ctx, uri );
+
         if not err then
-            uris, err = review( ctx, uri, src );
+            return review( ctx, uri, src );
         end
+
+        return nil, err;
     end
     
-    return uris, err;
+    return uris;
 end
 
 
@@ -219,43 +214,42 @@ local MT = {};
 
 function MT:publish( docroot, uri, data, layout )
     local ok = false;
-    local res, err;
+    local res, err, ctx, errs;
     
     if type( docroot ) ~= 'string' then
-        err = 'docroot must be type of string';
+        return false, nil, 'docroot must be type of string';
     elseif type( uri ) ~= 'string' then
-        err = 'uri must be type of string';
+        return false, nil, 'uri must be type of string';
     elseif layout ~= nil and type( layout ) ~= 'string' then
-        err = 'layout must be type of string';
-    else
-        local ctx = getContext( self, docroot );
-        local errs;
-        
-        -- check data type
-        data = type( data ) == 'table' and data or {};
-        
-        -- preflight for request-uri
-        err, errs = preflight( self, ctx, uri );
-        if not err then
-            -- run template
-            res, ok = ctx.rev:render( uri, data, true );
-        end
-        
-        -- check layout
-        if not err and layout then
-            -- preflight for layout
-            err = preflight( self, ctx, layout )
-            if err then
-                return false, res, err;
-            end
-            
-            -- set page response
-            rawset( data, 'layoutContent', res );
-            -- run template
-            res, ok = ctx.rev:render( layout, data, true );
-        end
+        return false, nil, 'layout must be type of string';
+    -- check data type
+    elseif type( data ) ~= 'table' then
+        data = {};
     end
-    
+
+    ctx = getContext( self, docroot );
+    -- preflight for request-uri
+    err, errs = preflight( self, ctx, uri );
+    if err then
+        return false, nil, err, errs;
+    end
+
+    -- run template
+    res, ok = ctx.rev:render( uri, data, true );
+    -- check layout
+    if ok and layout then
+        -- preflight for layout
+        err = preflight( self, ctx, layout );
+        if err then
+            return false, nil, err;
+        end
+
+        -- set page response
+        rawset( data, 'layoutContent', res );
+        -- run template
+        res, ok = ctx.rev:render( layout, data, true );
+    end
+
     return ok, res, err, errs;
 end
 
