@@ -13,7 +13,6 @@ local pages = require('pages').create({
 local uri = '/page.html';
 local layout = '/layout.html';
 local data = {
-    uri = uri,
     x = {
         y = {
             z = 'external data'
