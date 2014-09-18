@@ -228,26 +228,27 @@ function MT:publish( docroot, uri, data, layout )
     end
 
     ctx = getContext( self, docroot );
+
     -- preflight for request-uri
     err, errs = preflight( self, ctx, uri );
     if err then
         return false, nil, err, errs;
+    -- preflight for layout-uri
+    elseif layout then
+        err, errs = preflight( self, ctx, layout );
+        if err then
+            return false, nil, err, errs;
+        end
+
+        -- set content URI variable
+        rawset( data, 'PAGE_CONTENT', uri );
+        uri = layout;
     end
 
     -- run template
     res, ok = ctx.rev:render( uri, data, true );
-    -- check layout
-    if ok and layout then
-        -- preflight for layout
-        err = preflight( self, ctx, layout );
-        if err then
-            return false, nil, err;
-        end
-
-        -- set page response
-        rawset( data, 'layoutContent', res );
-        -- run template
-        res, ok = ctx.rev:render( layout, data, true );
+    if not ok then
+        return false, nil, res;
     end
 
     return ok, res, err, errs;
