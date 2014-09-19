@@ -46,7 +46,6 @@ local DEFAULT = {
 local function pathNormalize( ... )
     local argv = {...};
     local path = argv[1];
-    local seg = nil;
     local res = {};
     
     if #argv > 1 then
@@ -73,8 +72,6 @@ local function getContext( self, docroot )
     
     -- create tsukuyomi instance and cache-table per documentroot
     if not rev then
-        local tag, def;
-        
         rev = tsukuyomi.new( true, self.cfg.SANDBOX );
         self.instance[docroot] = rev;
         -- append ctags
@@ -258,7 +255,7 @@ end
 -- create template object
 local function create( cfg )
     local tbl = {};
-    local k, v, t, ck, cv;
+    local t, ck, cv;
     
     if cfg ~= nil and type( cfg ) ~= 'table' then
         error( 'config table must be type of table' );
