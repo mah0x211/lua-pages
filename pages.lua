@@ -168,7 +168,7 @@ end
 
 
 local function postflight( ctx, parentURI, uris, depth, errs )
-    local uri, childURIs;
+    local err, childURIs;
     
     for uri in pairs( uris ) do
         if depth < 1 then
