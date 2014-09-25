@@ -53,14 +53,13 @@ local pages = require('pages').create({
 
 ## Load And Render Template
 
-### ok, result, err = pages:publish( docroot, uri, data[, layoutURI] )
+### ok, result, err = pages:publish( docroot, uri, data )
 
 **Parameters**
 
 - docroot: path of document root.
 - uri: template path that based on docroot.
 - data: external table variable that used on template rendering.
-- layoutURI: layout-template path that based on docroot.
 
 
 **Returns**
@@ -84,6 +83,15 @@ local DOCROOT = './html';
 local ok, res, err = pages:publish( DOCROOT, '/index.html', data );
 print( ok, res, err );
 ```
+
+### Special Variables for Layouts Feature.
+
+the publish method will always check a special variables `$.PAGES_LAYOUT` and `$.PAGES_CONTENT`.
+
+if you set a layout URI to  `$.PAGES_LAYOUT` variable, the publish method will be set a rendered content into a `$.PAGES_CONTENT` variable, and render a layout URI.
+
+please check the `example/html/page.html` and `example/html/layout.html`.
+
 
 ## Template Syntax And Commands.
 
