@@ -209,7 +209,7 @@ end
 
 local MT = {};
 
-function MT:publish( docroot, uri, data, layout )
+function MT:publish( docroot, uri, data )
     local ok = false;
     local res, err, ctx, errs;
     
@@ -217,8 +217,6 @@ function MT:publish( docroot, uri, data, layout )
         return false, nil, 'docroot must be type of string';
     elseif type( uri ) ~= 'string' then
         return false, nil, 'uri must be type of string';
-    elseif layout ~= nil and type( layout ) ~= 'string' then
-        return false, nil, 'layout must be type of string';
     -- check data type
     elseif type( data ) ~= 'table' then
         data = {};
@@ -230,25 +228,33 @@ function MT:publish( docroot, uri, data, layout )
     err, errs = preflight( self, ctx, uri );
     if err then
         return false, nil, err, errs;
-    -- preflight for layout-uri
-    elseif layout then
-        err, errs = preflight( self, ctx, layout );
-        if err then
-            return false, nil, err, errs;
-        end
-
-        -- set content URI variable
-        rawset( data, 'PAGE_CONTENT', uri );
-        uri = layout;
     end
-
-    -- run template
+    -- render contents
     res, ok = ctx.rev:render( uri, data, true );
     if not ok then
         return false, nil, res;
     end
+    
+    -- has PAGE_LAYOUT variable
+    uri = rawget( data, 'PAGES_LAYOUT' );
+    if type( uri ) == 'string' then
+        -- preflight for layout-uri
+        err, errs = preflight( self, ctx, uri );
+        if err then
+            return false, nil, err, errs;
+        end
+        
+        -- set content string
+        rawset( data, 'PAGES_CONTENT', res );
+        -- render layout
+        res, ok = ctx.rev:render( uri, data, true );
+        if not ok then
+            return false, nil, res;
+        end
+    end
 
-    return ok, res, err, errs;
+
+    return ok, res;
 end
 
 
