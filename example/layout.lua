@@ -11,7 +11,6 @@ local pages = require('pages').create({
     cmds = require('cmds')
 });
 local uri = '/page.html';
-local layout = '/layout.html';
 local data = {
     x = {
         y = {
@@ -19,7 +18,7 @@ local data = {
         }
     }
 };
-local ok, res, err = pages:publish( DOCROOT, uri, data, layout );
+local ok, res, err = pages:publish( DOCROOT, uri, data );
 
 if res then
     print( res );
