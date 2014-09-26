@@ -18,7 +18,7 @@ local data = {
         }
     }
 };
-local ok, res, err = pages:publish( DOCROOT, uri, data );
+local res, err = pages:publish( DOCROOT, uri, data );
 
 if res then
     print( res );
