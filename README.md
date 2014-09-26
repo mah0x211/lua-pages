@@ -53,7 +53,7 @@ local pages = require('pages').create({
 
 ## Load And Render Template
 
-### ok, result, err = pages:publish( docroot, uri, data )
+### result, err, relatedErrs = pages:publish( docroot, uri, data )
 
 **Parameters**
 
@@ -64,10 +64,9 @@ local pages = require('pages').create({
 
 **Returns**
 
-1. ok: true on success, or false on failure.
-2. result: rendered string.
-3. err: error message string. you should check this value even if the `ok` is true.
-
+1. result: rendered string on success, or nil on failure.
+2. err: error message string.
+3. relatedErrs: an error table that associated with insertion command and layout processing.
 
 **Example**
 
@@ -80,8 +79,8 @@ local data = {
     }
 };
 local DOCROOT = './html';
-local ok, res, err = pages:publish( DOCROOT, '/index.html', data );
-print( ok, res, err );
+local res, err = pages:publish( DOCROOT, '/index.html', data );
+print( res, err );
 ```
 
 ### Special Variables for Layouts Feature.
@@ -96,4 +95,3 @@ please check the `example/html/page.html` and `example/html/layout.html`.
 ## Template Syntax And Commands.
 
 see [Template Syntax And Commands](https://github.com/mah0x211/tsukuyomi#template-syntax-and-commands) section of [tsukuyomi](https://github.com/mah0x211/tsukuyomi) module.
-
