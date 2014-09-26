@@ -167,20 +167,31 @@ local function imprint( ctx, uri )
 end
 
 
+local function addRelatedError( errs, uri, err )
+    local tbl = errs[uri];
+    
+    if type( tbl ) ~= 'table' then
+        tbl = {};
+        errs[uri] = tbl;
+    end
+    
+    tbl[#tbl+1] = err;
+end
+
+
 local function postflight( ctx, parentURI, uris, depth, errs )
     local err, childURIs;
     
     for uri in pairs( uris ) do
         if depth < 1 then
-            review( 
-                ctx, uri, 
-                ('<!-- could not insert: %q - %q : insertion-depth limit exceeded -->')
-                :format( parentURI, uri )
-            );
+            err = ('could not insert: %q - %q : insertion-depth limit exceeded')
+                  :format( parentURI, uri );
+            addRelatedError( errs, parentURI, err );
+            review( ctx, uri, ('<!-- %s -->'):format( err ) );
         else
             childURIs, err = imprint( ctx, uri );
             if err then
-                table.insert( errs, err );
+                addRelatedError( errs, parentURI, err );
             else
                 postflight( ctx, uri, childURIs, depth - 1, errs );
             end
@@ -189,21 +200,14 @@ local function postflight( ctx, parentURI, uris, depth, errs )
 end
 
 
-local function preflight( self, ctx, uri )
+local function preflight( self, ctx, uri, errs )
     local uris, err = imprint( ctx, uri );
-    local errs;
     
     if not err and uris then
-        errs = {};
         postflight( ctx, uri, uris, self.cfg.DEPTH, errs );
-        if #errs > 0 then
-            errs = table.concat( errs, '\n' );
-        else
-            errs = nil;
-        end
     end
     
-    return err, errs;
+    return err;
 end
 
 
@@ -211,7 +215,8 @@ local MT = {};
 
 function MT:publish( docroot, uri, data )
     local ok = false;
-    local res, err, ctx, errs;
+    local errs = {};
+    local res, err, ctx;
     
     if type( docroot ) ~= 'string' then
         return false, nil, 'docroot must be type of string';
@@ -221,40 +226,43 @@ function MT:publish( docroot, uri, data )
     elseif type( data ) ~= 'table' then
         data = {};
     end
-
+    
     ctx = getContext( self, docroot );
-
     -- preflight for request-uri
-    err, errs = preflight( self, ctx, uri );
+    err = preflight( self, ctx, uri, errs );
     if err then
-        return false, nil, err, errs;
+        return nil, err, errs;
     end
+    
     -- render contents
     res, ok = ctx.rev:render( uri, data, true );
     if not ok then
-        return false, nil, res;
+        return nil, res, errs;
     end
     
     -- has PAGE_LAYOUT variable
     uri = rawget( data, 'PAGES_LAYOUT' );
     if type( uri ) == 'string' then
         -- preflight for layout-uri
-        err, errs = preflight( self, ctx, uri );
+        err = preflight( self, ctx, uri, errs );
         if err then
-            return false, nil, err, errs;
-        end
-        
-        -- set content string
-        rawset( data, 'PAGES_CONTENT', res );
-        -- render layout
-        res, ok = ctx.rev:render( uri, data, true );
-        if not ok then
-            return false, nil, res;
+            addRelatedError( errs, uri, err );
+        else
+            local lres;
+            
+            -- set content string
+            rawset( data, 'PAGES_CONTENT', res );
+            -- render layout
+            lres, ok = ctx.rev:render( uri, data, true );
+            if not ok then
+                addRelatedError( errs, uri, lres );
+            else
+                res = lres;
+            end
         end
     end
 
-
-    return ok, res;
+    return res, nil, errs;
 end
 
 
