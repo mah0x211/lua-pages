@@ -30,7 +30,6 @@
 local sandbox = {};
 
 do
-    local idx, name;
     for idx,name in ipairs({
         --[[
         '_G',
