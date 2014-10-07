@@ -30,7 +30,7 @@
 local sandbox = {};
 
 do
-    for idx,name in ipairs({
+    for _, name in ipairs({
         --[[
         '_G',
         '_VERSION',
