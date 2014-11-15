@@ -4,6 +4,11 @@ lua-pages
 Lua Template Processor.  
 this module use the [tsukuyomi](https://github.com/mah0x211/tsukuyomi) template engine internally.
 
+## Dependencies
+
+- tsukuyomi: https://github.com/mah0x211/tsukuyomi
+
+
 ## Installation
 
 ```sh
