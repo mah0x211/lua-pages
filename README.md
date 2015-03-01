@@ -12,7 +12,7 @@ this module use the [tsukuyomi](https://github.com/mah0x211/tsukuyomi) template 
 ## Installation
 
 ```sh
-luarocks install --from=http://mah0x211.github.io/rocks/ pages
+luarocks install pages --from=http://mah0x211.github.io/rocks/
 ```
 
 ## Create Template Object
