@@ -219,9 +219,9 @@ function MT:publish( docroot, uri, data )
     local res, err, ctx;
     
     if type( docroot ) ~= 'string' then
-        return false, nil, 'docroot must be type of string';
+        return nil, 'docroot must be type of string';
     elseif type( uri ) ~= 'string' then
-        return false, nil, 'uri must be type of string';
+        return nil, 'uri must be type of string';
     -- check data type
     elseif type( data ) ~= 'table' then
         data = {};
