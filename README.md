@@ -26,7 +26,8 @@ luarocks install pages --from=http://mah0x211.github.io/rocks/
   - `depth` = 1, -- number of insertion depth limit.
   - `sandbox` = _G, -- sandboxing.
   - `cmds` = {}, -- custom-commands
-  - `fixnl` = false -- fix newline character (replace CR/CRLF to LF)
+  - `fixnl` = false, -- fix newline character (replace CR/CRLF to LF)
+  - `nolf` = true -- eliminate a trailing line-feed
 
 
 **Returns**
@@ -47,7 +48,9 @@ local pages = require('pages').create({
     -- custom-commands
     cmds = require('cmds'),
     -- fix newline character (replace CR/CRLF to LF)
-    fixnl = false
+    fixnl = false,
+    -- eliminate a trailing line-feed
+    nolf = true
 });
 ```
 
