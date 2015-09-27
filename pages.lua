@@ -39,7 +39,9 @@ local DEFAULT = {
     -- custom-commands
     CMDS = {},
     -- fix newline character (replace CR/CRLF to LF)
-    FIXNL = false
+    FIXNL = false,
+    -- eliminate a trailing line-feed
+    NOLF = true
 };
 
 
@@ -136,7 +138,7 @@ end
 
 -- compile and cache a template
 local function review( ctx, uri, src )
-    local uris, err = ctx.rev:setPage( uri, src );
+    local uris, err = ctx.rev:setPage( uri, src, ctx.cfg.NOLF );
     
     if not err then
         ctx.caches[uri] = {
